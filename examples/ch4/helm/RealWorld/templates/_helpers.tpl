@@ -23,6 +23,19 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{- define "realworld.frontendFullName" -}}
+{{- if .Values.frontendFullName }}
+{{- .Values.frontendFullName | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default "frontend" .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{/* Uncomment this to have the problem happen
 {{- define "mongodb.fullname" -}}
 {{- if .Values.mongodb.fullnameOverride }}

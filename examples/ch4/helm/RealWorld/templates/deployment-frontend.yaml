@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "realworld.fullname" . }}
+  name: {{ include "realworld.frontendFullName" . }}
   labels:
     {{- include "realworld.labels" . | nindent 4 }}
 spec:
@@ -32,7 +32,7 @@ spec:
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: 4100
               protocol: TCP
           livenessProbe:
             httpGet:

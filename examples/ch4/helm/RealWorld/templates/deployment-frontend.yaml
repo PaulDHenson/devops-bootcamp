@@ -1,22 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "realworld.frontendFullName" . }}
+  name: frontend
   labels:
-    {{- include "realworld.labels" . | nindent 4 }}
+    app.kubernetes.io/instance: realworld
+    app.kubernetes.io/name: frontend
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      {{- include "realworld.selectorLabels" . | nindent 6 }}
+    matchLabels: 
+      app.kubernetes.io/instance: realworld
+      app.kubernetes.io/name: frontend
   template:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      labels:
-        {{- include "realworld.selectorLabels" . | nindent 8 }}
+      labels: 
+        app.kubernetes.io/instance: realworld
+        app.kubernetes.io/name: frontend
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -28,7 +31,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
           ports:
             - name: http
@@ -36,21 +39,14 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /api/tags/
+              path: /
               port: http
           readinessProbe:
             httpGet:
-              path: /api/tags/
+              path: /
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            - name: MONGODB_URI
-              value: mongodb://root:hello@{{ .Release.Name }}-mongodb
-            - name: NODE_ENV
-              value: production
-            - name: SECRET
-              value: shhhhhh
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
